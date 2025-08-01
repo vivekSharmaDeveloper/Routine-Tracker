@@ -11,6 +11,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { RootState, AppDispatch } from '@/src/app/lib/store'
 import { setStreakGoal } from '@/src/app/lib/habitSlice'
 import { isHabitDueToday } from '@/src/utils/habitUtils'
+import ProtectedRoute from '@/src/components/ProtectedRoute'
 
 interface UserData {
   name: string
@@ -230,8 +231,9 @@ export default function AccountPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
-      <div className="max-w-4xl mx-auto">
+    <ProtectedRoute>
+      <main className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
+        <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">My Account</h1>
@@ -559,7 +561,8 @@ export default function AccountPage() {
             </div>
           </div>
         </div>
-      </div>
-    </main>
+        </div>
+      </main>
+    </ProtectedRoute>
   )
 }
