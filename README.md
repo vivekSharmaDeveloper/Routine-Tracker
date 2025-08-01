@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# Routine Tracker
 
-First, run the development server:
+Routine Tracker is a habit tracker application built using Next.js and React. This app allows users to track their daily habits, set goals, and visualize their progress over time.
+
+## Prerequisites
+
+Make sure you have the following installed on your system:
+
+- Node.js (v14.x or later)
+- npm or Yarn
+- Git
+
+## Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/vivekSharmaDeveloper/Routine-Tracker.git
+   cd Routine-Tracker
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   # or if you're using yarn
+   yarn install
+   ```
+
+## Development
+
+To start the development server, run:
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This will start a local development server at `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+To create an optimized production build, run:
 
-## Learn More
+```bash
+npm run build
+# or
+yarn build
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The application is ready to be deployed to platforms like Vercel.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Make sure to update the environment variables in Vercel.
+2. Push your changes to the remote repository.
+3. Trigger a deployment on Vercel or set it up to auto-deploy on push.
 
-## Deploy on Vercel
+## Environment Variables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Ensure you set the following environment variables in your Vercel dashboard or a `.env.local` file in the root directory.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `DATABASE_URL` - Connection string for your database.
+- `NEXTAUTH_URL` - The URL where your Next.js app will be running.
+- `SECRET_KEY` - A secret key for signing cookies.
+
+## Contributing
+
+Feel free to open issues or submit pull requests if you would like to contribute.
+
+## License
+
+This project is licensed under the MIT License.
+
+
