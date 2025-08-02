@@ -25,11 +25,22 @@ export default function HabitsHistoryPage() {
 
 const filteredHabits = habits.filter(habit => {
     const matchesSearch = habit.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter =
-      filterStatus === 'all' ||
-      (filterStatus === 'completed' && habit.isCompleted === true) ||
-      (filterStatus === 'ongoing' && !habit.isCompleted && !habit.isPaused) ||
-      (filterStatus === 'paused' && habit.isPaused === true);
+    
+    let matchesFilter;
+    if (filterStatus === 'all') {
+      matchesFilter = true;
+    } else if (filterStatus === 'completed') {
+      matchesFilter = habit.isCompleted === true;
+    } else if (filterStatus === 'ongoing') {
+      matchesFilter = !habit.isCompleted && !habit.isPaused;
+    } else if (filterStatus === 'paused') {
+      // Show all paused habits regardless of due status
+      matchesFilter = habit.isPaused === true;
+    } else {
+      matchesFilter = false;
+    }
+    
+    console.log(`Habit "${habit.name}": search=${matchesSearch}, filter=${matchesFilter}, isPaused=${habit.isPaused}, status=${filterStatus}`);
     
     return matchesSearch && matchesFilter;
   });

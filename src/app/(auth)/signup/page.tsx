@@ -72,6 +72,19 @@ export default function RegisterPage() {
         return;
       }
 
+// Auto-login the newly registered user
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError('Registration successful but login failed. Please try logging in manually.');
+        router.push('/login');
+        return;
+      }
+
       router.push('/habits');
     } catch {
       setError('An unexpected error occurred');

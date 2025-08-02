@@ -71,26 +71,14 @@ export default function AccountPage() {
           if (userResponse.ok) {
             const userData = await userResponse.json();
             
-            // Fetch habits data for statistics
-            const habitsResponse = await fetch('/api/habits');
-            let habitsData = { habits: [], totalCompleted: 0, currentStreak: 0 };
-            if (habitsResponse.ok) {
-              habitsData = await habitsResponse.json();
-            }
-
-            // Calculate statistics
-            const totalHabits = habitsData.habits?.length || 0;
-            const completedHabits = habitsData.totalCompleted || 0;
-            const streak = habitsData.currentStreak || 0;
-
-            // Set user data
+            // Set user data (statistics are now calculated from Redux habits in real-time)
             const updatedUserData = {
               name: userData.name || session.user.name || '',
               email: userData.email || session.user.email || '',
               joinedDate: userData.joinedDate || new Date().toISOString(),
-              totalHabits,
-              completedHabits,
-              streak,
+              totalHabits: 0, // Will be calculated from habits state
+              completedHabits: 0, // Will be calculated from habits state
+              streak: 0, // Will be calculated from habits state
               profileImage: userData.profileImage || userData.image || session.user.image || null,
               id: userData.id,
               lastLogin: userData.lastLogin
@@ -133,6 +121,55 @@ export default function AccountPage() {
     fetchUserData();
   }, [session, status, error])
 
+  // Real-time statistics calculation based on habits state
+  const calculateStatistics = () => {
+    const todayIso = new Date().toISOString().split('T')[0];
+    
+    const totalDueToday = habits.filter(habit => 
+      !habit.isCompleted && isHabitDueToday(habit, todayIso)
+    ).length;
+    
+    const completedToday = habits.filter(habit => 
+      !habit.isCompleted && 
+      isHabitDueToday(habit, todayIso) && 
+      habit.statusByDate?.[todayIso] === 'done'
+    ).length;
+    
+    // Calculate streak
+    let currentStreak = 0;
+    const today = new Date();
+    
+    for (let i = 0; i < 365; i++) {
+      const checkDate = new Date(today);
+      checkDate.setDate(today.getDate() - i);
+      const dateIso = checkDate.toISOString().split('T')[0];
+      
+      const dueHabits = habits.filter(habit => 
+        !habit.isCompleted && isHabitDueToday(habit, dateIso)
+      );
+      
+      if (dueHabits.length === 0) continue;
+      
+      const completedHabits = dueHabits.filter(habit => 
+        habit.statusByDate?.[dateIso] === 'done'
+      );
+      
+      const completionRate = (completedHabits.length / dueHabits.length) * 100;
+      
+      if (completionRate >= streakGoal) {
+        currentStreak++;
+      } else {
+        break;
+      }
+    }
+    
+    return {
+      totalHabits: totalDueToday,
+      completedHabits: completedToday,
+      streak: currentStreak
+    };
+  };
+
   // Format last login date
   const formatLastLogin = (dateString: string) => {
     const date = new Date(dateString)
@@ -149,19 +186,33 @@ export default function AccountPage() {
   const handleSave = async () => {
     setIsLoading(true)
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      const response = await fetch('/api/user', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: editData.name,
+          email: editData.email
+        })
+      })
       
-      setUserData(prev => ({
-        ...prev,
-        name: editData.name,
-        email: editData.email
-      }))
-      
-      setIsEditing(false)
-      success('Profile Updated', 'Your profile has been successfully updated')
-    } catch {
-      error('Update Failed', 'Failed to update profile. Please try again.')
+      if (response.ok) {
+        const updatedUser = await response.json()
+        setUserData(prev => ({
+          ...prev,
+          name: updatedUser.name,
+          email: updatedUser.email
+        }))
+        setIsEditing(false)
+        success('Profile Updated', 'Your profile has been successfully updated')
+      } else {
+        const errorData = await response.json()
+        error('Update Failed', errorData.error || 'Failed to update profile. Please try again.')
+      }
+    } catch (err) {
+      console.error('Profile update error:', err)
+      error('Update Failed', 'Network error occurred. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -229,6 +280,9 @@ export default function AccountPage() {
       fileInputRef.current.click()
     }
   }
+
+  // Get real-time statistics
+  const stats = calculateStatistics();
 
   return (
     <ProtectedRoute>

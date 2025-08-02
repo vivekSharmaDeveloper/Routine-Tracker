@@ -93,9 +93,12 @@ export const rateLimit = (config: Partial<RateLimitConfig> = {}) => {
             'X-RateLimit-Limit': options.maxRequests.toString(),
             'X-RateLimit-Remaining': '0',
             'X-RateLimit-Reset': current.resetTime.toString(),
-            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' 
+              ? 'https://routinetracker.tech' 
+              : '*',
             'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+            'Access-Control-Allow-Credentials': 'true',
           },
         }
       );

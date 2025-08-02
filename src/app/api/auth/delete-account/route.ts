@@ -37,22 +37,14 @@ export async function POST(request: NextRequest) {
 
     const { password } = result.data
 
-    // Get token from cookies
-    const token = request.cookies.get('token')?.value
-    if (!token) {
+    // Get session using NextAuth
+    const { getServerSession } = await import('next-auth')
+    const { authOptions } = await import('../[...nextauth]/route')
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.email) {
       return NextResponse.json(
-        { error: 'Unauthorized - No token provided' },
-        { status: 401 }
-      )
-    }
-
-    // Verify and decode token
-    let decoded
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
-    } catch {
-      return NextResponse.json(
-        { error: 'Unauthorized - Invalid token' },
+        { error: 'Unauthorized - No session found' },
         { status: 401 }
       )
     }
@@ -60,8 +52,8 @@ export async function POST(request: NextRequest) {
     // Connect to database
     await dbConnect()
 
-    // Find user
-    const user = await User.findById(decoded.userId)
+    // Find user by email from session
+    const user = await User.findOne({ email: session.user.email })
     if (!user) {
       return NextResponse.json(
         { error: 'User not found' },
@@ -79,7 +71,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Delete user account
-    await User.findByIdAndDelete(decoded.userId)
+    await User.findByIdAndDelete(user._id)
 
     console.log(`Account deleted for user: ${user.email}`)
 

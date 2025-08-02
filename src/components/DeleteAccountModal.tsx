@@ -45,9 +45,13 @@ const DeleteAccountModal = ({ isOpen, onClose }: DeleteAccountModalProps) => {
       if (response.ok) {
         success('Account Deleted', 'Your account has been permanently deleted')
         
-        // Clear local storage
+// Clear local storage
         localStorage.clear()
         sessionStorage.clear()
+
+        // Logout using next-auth
+        const { signOut } = await import('next-auth/react')
+        await signOut({ redirect: false })
         
         // Close modal and redirect
         onClose()
