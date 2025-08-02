@@ -6,6 +6,18 @@ import { createErrorResponse } from '@/src/lib/errors';
 import { registrationRateLimit } from '@/src/lib/rateLimit';
 import { NextRequest, NextResponse } from 'next/server';
 
+// CORS headers
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+// Handle preflight requests
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, { status: 200, headers: corsHeaders });
+}
+
 export async function POST(req: NextRequest) {
   const rateLimitResponse = await registrationRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
@@ -22,7 +34,7 @@ export async function POST(req: NextRequest) {
     if (existingUser) {
       return NextResponse.json(
         { error: 'User with this email already exists' },
-        { status: 409 }
+        { status: 409, headers: corsHeaders }
       );
     }
 
@@ -37,10 +49,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       message: 'User registered successfully',
       userId: user._id,
-    }, { status: 201 });
+    }, { status: 201, headers: corsHeaders });
 
   } catch (error) {
     console.error('Registration error:', error);
-    return createErrorResponse(error, 'Error registering user');
+    return createErrorResponse(error, 'Error registering user', corsHeaders);
   }
 }

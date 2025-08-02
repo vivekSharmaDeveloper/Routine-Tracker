@@ -99,7 +99,8 @@ export const asyncHandler = <T extends unknown[], R>(
 // API Error Response Helper
 export const createErrorResponse = (
   error: unknown,
-  defaultMessage: string = 'An error occurred'
+  defaultMessage: string = 'An error occurred',
+  additionalHeaders: Record<string, string> = {}
 ): Response => {
   // Handle Zod validation errors specifically
   if (error && typeof error === 'object' && 'issues' in error) {
@@ -119,6 +120,7 @@ export const createErrorResponse = (
         status: 400,
         headers: {
           'Content-Type': 'application/json',
+          ...additionalHeaders,
         },
       }
     );
@@ -136,6 +138,7 @@ export const createErrorResponse = (
       status: apiError.statusCode || 500,
       headers: {
         'Content-Type': 'application/json',
+        ...additionalHeaders,
       },
     }
   );

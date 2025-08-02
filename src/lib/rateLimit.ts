@@ -93,6 +93,9 @@ export const rateLimit = (config: Partial<RateLimitConfig> = {}) => {
             'X-RateLimit-Limit': options.maxRequests.toString(),
             'X-RateLimit-Remaining': '0',
             'X-RateLimit-Reset': current.resetTime.toString(),
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
           },
         }
       );
